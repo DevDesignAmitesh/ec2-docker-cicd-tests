@@ -1,4 +1,4 @@
-name: CI for backend app
+name: CI-CD for backend app
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   Continuous-Integration:
-    name: Runs the tests for the backend app
+    name: Runs the tests, build the app and deploy to ec2.
     runs-on: ubuntu-latest
 
     steps:
@@ -35,6 +35,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/ec2-docker-cicd-tests:latest
-            sudo docker stop learn-ci-cd || true
-            sudo docker rm learn-ci-cd || true
-            sudo docker run -d --name learn-ci-cd -p 5555:3000 ${{ secrets.DOCKER_USERNAME }}/ec2-docker-cicd-tests:latest
+            sudo docker stop ec2-docker-cicd-tests || true
+            sudo docker rm ec2-docker-cicd-tests || true
+            sudo docker run -d --name ec2-docker-cicd-tests -p 5555:3000 ${{ secrets.DOCKER_USERNAME }}/ec2-docker-cicd-tests:latest
