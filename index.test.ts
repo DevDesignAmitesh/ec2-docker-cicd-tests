@@ -2,7 +2,8 @@ import { describe, it, expect } from "bun:test";
 import axios from "axios";
 import type { Todo } from ".";
 
-const BASE_URL = "http://localhost:3000/";
+// const BASE_URL = "http://localhost:3000/";
+const BASE_URL = "https://uncombustive-scripturally-thomas.ngrok-free.dev/";
 let todoId = "";
 
 describe("/POST todos", () => {
