@@ -1,0 +1,40 @@
+name: CI for backend app
+
+on:
+  push:
+    branches: ["backend"]
+
+jobs:
+  Continuous-Integration:
+    name: Runs the tests for the backend app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: login in to docker hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: build and push to docker hub
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/ec2-docker-cicd-tests:latest
+
+      - name: deploy to ec2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/ec2-docker-cicd-tests:latest
+            sudo docker stop learn-ci-cd || true
+            sudo docker rm learn-ci-cd || true
+            sudo docker run -d --name learn-ci-cd -p 5555:3000 ${{ secrets.DOCKER_USERNAME }}/ec2-docker-cicd-tests:latest
