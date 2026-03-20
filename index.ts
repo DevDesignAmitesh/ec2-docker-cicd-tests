@@ -1,12 +1,13 @@
 import express from "express";
 
 const app = express();
+app.use(express.json());
 
-type Todo = {
+export type Todo = {
   id: string;
   title: string;
   decription: string;
-  isCompleted: string;
+  isCompleted: boolean;
 }
 
 let todos: Todo[] = []
@@ -16,6 +17,7 @@ app.get("/todos", (req, res) => {
 })
 
 app.get("/todos/:id", (req, res) => {
+  console.log("req.params ", req.params)
   const todo = todos.find((td) => td.id === req.params.id);
   if (!todo) return res.status(404).json({ message: "not found" })
 
@@ -32,6 +34,8 @@ app.post("/todos", (req, res) => {
 })
 
 app.delete("/todos/:id", (req, res) => {
+  console.log("req.params ", req.params)
+  
   const todo = todos.find((td) => td.id === req.params.id);
   if (!todo) return res.status(404).json({ message: "not found" })
 
@@ -42,12 +46,13 @@ app.delete("/todos/:id", (req, res) => {
 })
 
 app.put("/todos/:id", (req, res) => {
-  const data = req.body as Todo;
+  console.log("req.params ", req.params)
+  const data = req.body as Omit<Todo, "id">;
   const todo = todos.find((td) => td.id === req.params.id);
   if (!todo) return res.status(404).json({ message: "not found" })
 
   const updatedTodo: Todo = {
-    id: data.id ?? todo.id,
+    id: todo.id,
     title: data.title ?? todo.title,
     decription: data.decription ?? todo.decription,
     isCompleted: data.isCompleted ?? todo.isCompleted,
@@ -59,4 +64,7 @@ app.put("/todos/:id", (req, res) => {
 
   res.json({ message: "done" })
 
-})
+});
+
+
+app.listen(3000)
